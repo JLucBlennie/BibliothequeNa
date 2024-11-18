@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "isbn": "9782253262244",
+        "name": "Qui ne se plante pas ne pousse jamais",
+        "author": "Sophie TAL MEN",
+        "image": "",
+        "note": "4",
+        "statut": "Lu"
+    },
+    {
+        "id": 2,
+        "isbn": "9782253079743",
+        "name": "Va où le vent te berce",
+        "author": "Sophie TAL MEN",
+        "image": "",
+        "note": "3",
+        "statut": "Lu"
+    }
+]
