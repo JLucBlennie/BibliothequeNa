@@ -1,4 +1,4 @@
-import { ImageBackground, StyleSheet, View, Text, TextInput, Alert, FlatList, Pressable } from 'react-native';
+import { Pressable, ImageBackground, StyleSheet, View, Text, TextInput, Alert, FlatList } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 import { useState } from 'react';
 import { Asset } from "expo-asset";
@@ -13,11 +13,11 @@ import * as SecureStore from 'expo-secure-store';
 
 const PlaceholderImage = { uri: Asset.fromModule(require('@/assets/images/background.png')).uri };
 
-export default function Index() {
+export default function WishList() {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(true);
   const [imagePath, setImagePath] = useState('');
-  const [alreadyRead, setAlreadyRead] = useState(true);
+  const [alreadyWished, setAlreadyWished] = useState(true);
   const [firstLaunch, setFirstLaunch] = useState(true);
   const [toAdd, setToAdd] = useState(false);
   const [titreLivre, setTitreLivre] = useState('');
@@ -97,21 +97,21 @@ export default function Index() {
         Alert.alert("Tu l'as déjà dans la Wish List !!!");
       else
         Alert.alert("Tu l'as déjà Lu !!!");
-      setAlreadyRead(true);
+      setAlreadyWished(true);
     } else {
-      setAlreadyRead(false);
+      setAlreadyWished(false);
       console.log("Le livre n'a pas été lu encore... ==> " + scanningResult.data);
       setISBN(scanningResult.data);
     }
   }
 
   function handleNePasAjouter() {
-    setAlreadyRead(true);
+    setAlreadyWished(true);
     setToAdd(false);
   }
 
   function handleCancel() {
-    setAlreadyRead(true);
+    setAlreadyWished(true);
     setToAdd(false);
     setTitreLivre('');
     setNomAuteur('');
@@ -126,7 +126,7 @@ export default function Index() {
     let idNewBook: number;
     idNewBook = bddJSON.length + 1;
     bddJSON.push({
-      "id": idNewBook, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": "4", "statut": "Lu"
+      "id": idNewBook, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": "4", "statut": "Wish"
     });
     console.log(bddJSON);
     SecureStore.setItemAsync("bdd", JSON.stringify(bddJSON)).then(() => {
@@ -134,7 +134,7 @@ export default function Index() {
     }).catch(err => {
       console.log("Pb : " + err);
     });
-    setAlreadyRead(true);
+    setAlreadyWished(true);
     setToAdd(false);
     setTitreLivre('');
     setNomAuteur('');
@@ -143,7 +143,6 @@ export default function Index() {
   function handleCancelCamera() {
     setScanned(true);
   }
-
   function openBookCard(id: number) {
     console.log("ouverture de la carte : " + id);
   }
@@ -184,29 +183,27 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <ImageBackground style={styles.imageContainer} source={PlaceholderImage}>
-        {delBook &&
-          <QDeleteBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={2} statut={"Lu"} handleOK={() => { deleteBookFromBDD() }} handleCancel={function (): void {
-            setDelBook(false);
-          }} />
-        }
-        {!delBook && scanned && alreadyRead &&
-          <View style={styles.listcontainer}>
+        <View style={styles.listcontainer}>
+          {delBook &&
+            <QDeleteBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={2} statut={"Lu"} handleOK={() => { deleteBookFromBDD() }} handleCancel={function (): void {
+              setDelBook(false);
+            }} />
+          }{!delBook && scanned && alreadyWished && <View style={styles.listcontainer}>
             <Text style={styles.listTitle}>
-              Mes Livres :
+              Mes Livres à lire :
             </Text>
             <FlatList
               style={styles.flatlist}
               data={bddJSON}
-              showsVerticalScrollIndicator={true}
+              showsVerticalScrollIndicator={false}
               renderItem={({ item }) =>
-                item.statut !== "Wish" ? <View ><Pressable onPress={() => { openBookCard(item.id) }} onLongPress={() => { deleteBook(item.id) }}><BookCard bookTitle={item.name} authorName={item.author} imagePath={item.image} note={parseInt(item.note)} statut={item.statut} /></Pressable></View> : <View />
+                item.statut === "Wish" ? <View ><Pressable onPress={() => { openBookCard(item.id) }} onLongPress={() => { deleteBook(item.id) }}><BookCard bookTitle={item.name} authorName={item.author} imagePath={item.image} note={parseInt(item.note)} statut={item.statut} /></Pressable></View> : <View />
               }
               keyExtractor={(item, index) => index.toString()}
             />
           </View>
-        }
-        {!delBook && !scanned &&
-          <View style={styles.listcontainer}>
+          }
+          {!delBook && !scanned && <View >
             <CameraView facing='back' barcodeScannerSettings={{
               barcodeTypes: ["ean13"],
             }} onBarcodeScanned={scanned ? undefined : scannedCode}>
@@ -215,27 +212,26 @@ export default function Index() {
               </View>
             </CameraView>
           </View>
-        }
-        {
-          !delBook && scanned && alreadyRead &&
-          <View style={styles.buttonContainer}>
-            <CircleButton iconName="camera" onPress={() => setScanned(false)} />
-          </View>
-        }
-        {
-          !delBook && scanned && !alreadyRead && !toAdd &&
-          <View style={styles.containerQuestion}>
-            <Text style={styles.text}>Tu veux l'ajouter dans ta liste des livres lus ?</Text>
-            <View style={styles.buttonContainerQuestion}>
-              <CircleButton iconName="check" onPress={handleAjouter} />
-              <CircleButton iconName="cancel" onPress={handleNePasAjouter} />
+          }
+          {
+            !delBook && scanned && alreadyWished && <View style={styles.buttonContainer}><CircleButton iconName="camera" onPress={() => setScanned(false)} /></View>
+          }
+          {
+            !delBook && scanned && !alreadyWished && !toAdd && <View style={styles.container}>
+              <Text style={styles.text}>Tu veux l'ajouter dans ta liste des livres lus ?</Text>
+              <View style={styles.buttonContainerQuestion}>
+                <CircleButton iconName="check" onPress={handleAjouter} />
+                <CircleButton iconName="cancel" onPress={handleNePasAjouter} />
+              </View>
             </View>
-          </View>
-        }
-        {
-          !delBook && scanned && !alreadyRead && toAdd &&
-          <AddBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={''} statut={'Lu'} handleOk={handleOk} handleCancel={handleCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} />
-        }
+          }
+          {
+            !delBook && scanned && !alreadyWished && toAdd &&
+            <View style={styles.container}>
+              <AddBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={''} statut={'Lu'} handleOk={handleOk} handleCancel={handleCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} />
+            </View>
+          }
+        </View>
       </ImageBackground>
     </View>
   );

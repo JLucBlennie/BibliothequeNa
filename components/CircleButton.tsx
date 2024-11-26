@@ -26,6 +26,10 @@ export default function CircleButton({ iconName, onPress }: Props) {
                     iconName === "cancel" &&
                     <MaterialIcons name="cancel" size={38} color="#25292e" />
                 }
+                {
+                    iconName === "delete" &&
+                    <MaterialIcons name="delete" size={38} color="#25292e" />
+                }
             </Pressable>
         </View>
     );

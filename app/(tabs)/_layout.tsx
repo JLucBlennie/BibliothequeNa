@@ -16,7 +16,11 @@ export default function TabLayout() {
         }}>
             <Tabs.Screen name="index" options={{
                 title: 'Ma bibliothèque', tabBarIcon: ({ color, focused }) => (
-                    <Ionicons name={focused ? 'home-sharp' : 'home-outline'} color={color} size={24} />)
+                    <Ionicons name={focused ? 'library-sharp' : 'library-outline'} color={color} size={24} />)
+            }} />
+            <Tabs.Screen name="wishlist" options={{
+                title: 'Ma Wish List...', tabBarIcon: ({ color, focused }) => (
+                    <Ionicons name={focused ? 'list-sharp' : 'list-outline'} color={color} size={24} />)
             }} />
             <Tabs.Screen name="about" options={{
                 title: 'About', tabBarIcon: ({ color, focused }) => (
