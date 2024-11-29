@@ -19,6 +19,7 @@ type Props = {
 
 export default function AddBook({ bookTitle, authorName, imagePath, note, statut, handleOk, handleCancel, setTitreLivre, setNomAuteur, setImagePath }: Props) {
     const [scanned, setScanned] = useState(true);
+    const [imageTmp, setImageTmp] = useState({ uri: imagePath });
     let camera: CameraView;
 
     function handleCancelCamera() {
@@ -32,6 +33,7 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
             if (photo !== undefined) {
                 console.log("Prise de la photo ==> " + photo.uri);
                 setImagePath(photo.uri);
+                setImageTmp(photo);
                 setScanned(true);
             }
         })
@@ -52,16 +54,19 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
                 onChangeText={newText => setNomAuteur(newText)}
                 defaultValue={authorName}
             />
+            {/* Ajouter La note et les statuts : Lu, Pas Lu, A Lire */}
             {
                 !scanned &&
-                <View>
+                <View style={stylesAddBook.container}>
                     <CameraView facing='back' ref={(r) => {
                         if (r !== null)
                             camera = r
                     }}>
-                        <View style={stylesAddBook.buttonCameraContainer}>
-                            <CircleButton iconName="check" onPress={handleOkImage} />
-                            <CircleButton iconName="cancel" onPress={handleCancelCamera} />
+                        <View style={stylesAddBook.buttonbottomplaced}>
+                            <View style={stylesAddBook.buttonCameraContainer}>
+                                <CircleButton iconName="check" onPress={handleOkImage} />
+                                <CircleButton iconName="cancel" onPress={handleCancelCamera} />
+                            </View>
                         </View>
                     </CameraView>
                 </View>
@@ -73,16 +78,18 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
                 </View>
             }
             {
-                imagePath !== '' &&
-                <View style={stylesAddBook.container}>
-                    <Image source={imagePath} style={stylesAddBook.image} />
+                scanned && /* imageTmp.uri.length > 0 && */
+                <View style={stylesAddBook.imageContainer}>
+                    <Image source={imageTmp} style={stylesAddBook.image} />
                 </View>
             }
-            {/* Ajouter La note et les statuts : Lu, Pas Lu, A Lire */}
-            <View style={stylesAddBook.buttonContainerAdd}>
-                <CircleButton iconName="check" onPress={handleOk} />
-                <CircleButton iconName="cancel" onPress={handleCancel} />
-            </View>
+            {
+                scanned &&
+                <View style={stylesAddBook.buttonContainerAdd}>
+                    <CircleButton iconName="check" onPress={handleOk} />
+                    <CircleButton iconName="cancel" onPress={handleCancel} />
+                </View>
+            }
         </View>
     );
 }
@@ -110,6 +117,12 @@ const stylesAddBook = StyleSheet.create({
     },
     camera: {
         flex: 1,
+    },
+    buttonbottomplaced: {
+        flex: 1,
+        flexDirection: 'column',
+        backgroundColor: 'transparent',
+        margin: 64,
     },
     buttonContainerAdd: {
         flex: 1,

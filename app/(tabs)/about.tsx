@@ -1,7 +1,7 @@
 import { ImageBackground, Text, View, StyleSheet } from 'react-native';
 import { Asset } from "expo-asset";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import appJson from '@/package.json';
+import appJson from '@/app.json';
 
 const PlaceholderImage = { uri: Asset.fromModule(require('@/assets/images/background.png')).uri };
 
@@ -12,7 +12,7 @@ export default function AboutScreen() {
         <View style={styles.aboutcontainer}>
           <FontAwesome5 name="book-open" size={38} color="#ffd33d" />
           <Text style={styles.text}>Version de l'application</Text>
-          <Text style={styles.text}>Bibliothèque de Na ({appJson.name}) by JLuc - V{appJson.version} </Text>
+          <Text style={styles.text}>Bibliothèque de Na ({appJson.expo.name}) by JLuc - V{appJson.expo.version} </Text>
         </View>
       </ImageBackground>
     </View >

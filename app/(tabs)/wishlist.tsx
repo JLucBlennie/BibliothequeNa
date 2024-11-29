@@ -1,6 +1,6 @@
 import { Pressable, ImageBackground, StyleSheet, View, Text, TextInput, Alert, FlatList } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Asset } from "expo-asset";
 import * as FileSystem from 'expo-file-system';
 import CircleButton from '@/components/CircleButton';
@@ -8,8 +8,8 @@ import AddBook from '@/components/AddBook';
 import QDeleteBook from '@/components/QDeleteBook';
 import BookCard from '@/components/BookCard';
 import Button from '@/components/Button';
-import bddJSONFirst from '@/assets/data/bibna.json';
 import * as SecureStore from 'expo-secure-store';
+import { bddJSON } from './_layout';
 
 const PlaceholderImage = { uri: Asset.fromModule(require('@/assets/images/background.png')).uri };
 
@@ -23,7 +23,7 @@ export default function WishList() {
   const [titreLivre, setTitreLivre] = useState('');
   const [nomAuteur, setNomAuteur] = useState('');
   const [isbn, setISBN] = useState('');
-  const [bddJSON, setBdd] = useState(bddJSONFirst);
+  let bdd = useContext(bddJSON);
   const [idBookToDelete, setIdBookToDelete] = useState(-1);
   const [idBookToEdit, setIdBookToEdit] = useState(-1);
   const [editBook, setEditBook] = useState(false);
@@ -33,13 +33,13 @@ export default function WishList() {
     SecureStore.getItemAsync("bdd").then((value: string | null) => {
       console.log("Valeur stockée = " + value);
       if (value !== null)
-        setBdd(JSON.parse(value));
+        bdd = JSON.parse(value);
     }
     );
     setFirstLaunch(false);
   }
   console.log("ReadBDD ==> ");
-  console.log(bddJSON);
+  console.log(bdd);
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -57,7 +57,7 @@ export default function WishList() {
   }
 
   function saveBDD() {
-    SecureStore.setItemAsync("bdd", JSON.stringify(bddJSON)).then(() => {
+    SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
       console.log("Fichier rempli");
     }).catch(err => {
       console.log("Pb : " + err);
@@ -85,7 +85,7 @@ export default function WishList() {
     });
     let livreTrouve = false;
     let livreInWishList = false;
-    bddJSON.map((item) => {
+    bdd.map((item) => {
       console.log("ISBN de BDD = " + item.isbn + " vs ISBN Scanned = " + scanningResult.data);
       if (item.isbn === scanningResult.data || item.name === titreLivre) {
         livreTrouve = true;
@@ -124,12 +124,12 @@ export default function WishList() {
   function handleOk() {
     console.log("ajouter le livre : " + titreLivre + " de " + nomAuteur);
     let idNewBook: number;
-    idNewBook = bddJSON.length + 1;
-    bddJSON.push({
+    idNewBook = bdd.length + 1;
+    bdd.push({
       "id": idNewBook, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": "4", "statut": "Wish"
     });
-    console.log(bddJSON);
-    SecureStore.setItemAsync("bdd", JSON.stringify(bddJSON)).then(() => {
+    console.log(bdd);
+    SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
       console.log("Fichier rempli");
     }).catch(err => {
       console.log("Pb : " + err);
@@ -150,7 +150,7 @@ export default function WishList() {
   function deleteBook(idBook: number) {
 
     console.log("suppression du livre : " + idBook);
-    bddJSON.forEach((value: { id: number; isbn: string; name: string; author: string; image: string; note: string; statut: string; }) => {
+    bdd.forEach((value: { id: number; isbn: string; name: string; author: string; image: string; note: string; statut: string; }) => {
       if (value.id === idBook) {
         console.log("suppression du livre : " + value.name);
         setIdBookToDelete(value.id);
@@ -163,13 +163,13 @@ export default function WishList() {
 
   function deleteBookFromBDD() {
     console.log("Delete Book : " + titreLivre + " -> idBookToDelete : " + idBookToDelete);
-    var index: number = bddJSON.findIndex((item, i) => {
+    var index: number = bdd.findIndex((item, i) => {
       if (item.id === idBookToDelete)
         return i;
     });
     console.log("Delete Book : " + titreLivre + " -> index : " + index);
-    bddJSON.splice(index, 1);
-    SecureStore.setItemAsync("bdd", JSON.stringify(bddJSON)).then(() => {
+    bdd.splice(index, 1);
+    SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
       console.log("Fichier rempli");
     }).catch(err => {
       console.log("Pb : " + err);
@@ -194,7 +194,7 @@ export default function WishList() {
             </Text>
             <FlatList
               style={styles.flatlist}
-              data={bddJSON}
+              data={bdd}
               showsVerticalScrollIndicator={false}
               renderItem={({ item }) =>
                 item.statut === "Wish" ? <View ><Pressable onPress={() => { openBookCard(item.id) }} onLongPress={() => { deleteBook(item.id) }}><BookCard bookTitle={item.name} authorName={item.author} imagePath={item.image} note={parseInt(item.note)} statut={item.statut} /></Pressable></View> : <View />
