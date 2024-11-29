@@ -23,7 +23,7 @@ export default function WishList() {
   const [titreLivre, setTitreLivre] = useState('');
   const [nomAuteur, setNomAuteur] = useState('');
   const [isbn, setISBN] = useState('');
-  const [bddJSON, setBdd] = useState(bddJSONFirst);
+  const [bddJSON, setBdd] = useState(bddJSONFirst); // Voir useContext()
   const [idBookToDelete, setIdBookToDelete] = useState(-1);
   const [idBookToEdit, setIdBookToEdit] = useState(-1);
   const [editBook, setEditBook] = useState(false);
