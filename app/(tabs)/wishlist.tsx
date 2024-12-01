@@ -9,7 +9,8 @@ import QDeleteBook from '@/components/QDeleteBook';
 import BookCard from '@/components/BookCard';
 import Button from '@/components/Button';
 import * as SecureStore from 'expo-secure-store';
-import { bddJSON } from './_layout';
+import bddJSONFirst from '@/assets/data/bibna.json';
+import { useBiblothequeNAContext } from '@/hooks/BibliothequeNAContext';
 
 const PlaceholderImage = { uri: Asset.fromModule(require('@/assets/images/background.png')).uri };
 
@@ -23,7 +24,7 @@ export default function WishList() {
   const [titreLivre, setTitreLivre] = useState('');
   const [nomAuteur, setNomAuteur] = useState('');
   const [isbn, setISBN] = useState('');
-  let bdd = useContext(bddJSON);
+  const {bdd, setBdd} = useBiblothequeNAContext();
   const [idBookToDelete, setIdBookToDelete] = useState(-1);
   const [idBookToEdit, setIdBookToEdit] = useState(-1);
   const [editBook, setEditBook] = useState(false);
@@ -31,15 +32,14 @@ export default function WishList() {
 
   if (firstLaunch) {
     SecureStore.getItemAsync("bdd").then((value: string | null) => {
-      console.log("Valeur stockée = " + value);
+      console.log("WishList : Valeur stockée = " + value);
       if (value !== null)
-        bdd = JSON.parse(value);
-    }
-    );
+        setBdd(JSON.parse(value));
+      console.log("WishList : ReadBDD ==> ");
+      console.log(bdd);
+    });
     setFirstLaunch(false);
   }
-  console.log("ReadBDD ==> ");
-  console.log(bdd);
 
   if (!permission) {
     // Camera permissions are still loading.

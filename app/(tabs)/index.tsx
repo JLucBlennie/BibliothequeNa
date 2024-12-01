@@ -1,15 +1,16 @@
 import { ImageBackground, StyleSheet, View, Text, TextInput, Alert, FlatList, Pressable } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Asset } from "expo-asset";
 import * as FileSystem from 'expo-file-system';
+import { File, Paths } from 'expo-file-system/next';
 import CircleButton from '@/components/CircleButton';
 import AddBook from '@/components/AddBook';
 import QDeleteBook from '@/components/QDeleteBook';
 import BookCard from '@/components/BookCard';
 import Button from '@/components/Button';
 import * as SecureStore from 'expo-secure-store';
-import { bddJSON } from './_layout';
+import { useBiblothequeNAContext } from '@/hooks/BibliothequeNAContext';
 
 const PlaceholderImage = { uri: Asset.fromModule(require('@/assets/images/background.png')).uri };
 
@@ -23,7 +24,7 @@ export default function Index() {
   const [titreLivre, setTitreLivre] = useState('');
   const [nomAuteur, setNomAuteur] = useState('');
   const [isbn, setISBN] = useState('');
-  let bdd = useContext(bddJSON);
+  const {bdd, setBdd} = useBiblothequeNAContext();
   const [idBookToDelete, setIdBookToDelete] = useState(-1);
   const [idBookToEdit, setIdBookToEdit] = useState(-1);
   const [editBook, setEditBook] = useState(false);
@@ -31,15 +32,15 @@ export default function Index() {
 
   if (firstLaunch) {
     SecureStore.getItemAsync("bdd").then((value: string | null) => {
-      console.log("Valeur stockée = " + value);
+      console.log("Index : Valeur stockée = " + value);
       if (value !== null)
-        bdd = JSON.parse(value);
-    }
-    );
+        setBdd(JSON.parse(value));
+      console.log("Index : ReadBDD ==> ");
+      console.log(bdd);
+    });
     setFirstLaunch(false);
   }
-  console.log("ReadBDD ==> ");
-  console.log(bdd);
+
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -56,12 +57,35 @@ export default function Index() {
     );
   }
 
-  function saveBDD() {
-    SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
-      console.log("Fichier rempli");
-    }).catch(err => {
-      console.log("Pb : " + err);
+  async function ensureDirExists(dir: string) {
+    const dirInfo = await FileSystem.getInfoAsync(dir);
+    if (!dirInfo.exists) {
+      console.log("Gif directory doesn't exist, creating…");
+      await FileSystem.makeDirectoryAsync(dir, { intermediates: true });
+    }
+  }
+
+  function saveBDD(): string {
+    console.log("SaveBDD ==> " + bdd);
+    const bibNaDir = Paths.document + "BibliothequeNa/";
+    console.log("SaveBDD ==> " + bibNaDir);
+    ensureDirExists(bibNaDir).then(() => {
+      const file = new File(bibNaDir, 'bdd.json');
+      FileSystem.getInfoAsync(file.uri).then((fileInfo) => {
+        console.log("SaveBDD ==> FileInfo " + fileInfo);
+        if (!fileInfo.exists) {
+          file.create(); // can throw an error if the file already exists or no permission to create it
+        }
+      });
+      file.write(JSON.stringify(bdd));
+      console.log("SaveBDD ==> Ecriture du fichier " + file.uri);
+      console.log(file.text()); // Hello, world!
+      return file.uri;
+    }).catch((error) => {
+      console.error(error);
+      return "Pas de sauvegarde";
     });
+    return "Pas de sauvegarde";
   }
 
   const scannedCode = (scanningResult: BarcodeScanningResult) => {
@@ -131,13 +155,16 @@ export default function Index() {
     console.log(bdd);
     SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
       console.log("Fichier rempli");
+      const filePath = saveBDD();
+      console.log("BDD sauvee... " + filePath);
     }).catch(err => {
       console.log("Pb : " + err);
+    }).finally(() => {
+      setAlreadyRead(true);
+      setToAdd(false);
+      setTitreLivre('');
+      setNomAuteur('');
     });
-    setAlreadyRead(true);
-    setToAdd(false);
-    setTitreLivre('');
-    setNomAuteur('');
   }
 
   function handleCancelCamera() {
