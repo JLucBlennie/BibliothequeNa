@@ -261,7 +261,11 @@ export default function Index() {
         }
         {
           !delBook && scanned && !alreadyRead && toAdd &&
-          <AddBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={''} statut={'Lu'} handleOk={handleOk} handleCancel={handleCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} />
+          <AddBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={0} statut={'Lu'} handleOk={handleOk} handleCancel={handleCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} setStatut={function (str: string): void {
+            throw new Error('Function not implemented.');
+          } } setNote={function (num: number): void {
+            throw new Error('Function not implemented.');
+          } } />
         }
       </ImageBackground>
     </View>

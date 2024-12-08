@@ -24,7 +24,7 @@ export default function BookCard({ bookTitle, authorName, imagePath, note, statu
                 <Text style={styles.text}>Auteur : {authorName}</Text>
                 <View style={styles.notestatut}>
                     <Text style={styles.textstatut}>{statut}</Text>
-                    <Note note={note} />
+                    <Note note={note} taille={18} />
                 </View>
             </View>
         </View>

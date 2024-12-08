@@ -24,7 +24,7 @@ export default function WishList() {
   const [titreLivre, setTitreLivre] = useState('');
   const [nomAuteur, setNomAuteur] = useState('');
   const [isbn, setISBN] = useState('');
-  const {bdd, setBdd} = useBiblothequeNAContext();
+  const { bdd, setBdd } = useBiblothequeNAContext();
   const [idBookToDelete, setIdBookToDelete] = useState(-1);
   const [idBookToEdit, setIdBookToEdit] = useState(-1);
   const [editBook, setEditBook] = useState(false);
@@ -228,7 +228,11 @@ export default function WishList() {
           {
             !delBook && scanned && !alreadyWished && toAdd &&
             <View style={styles.container}>
-              <AddBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={''} statut={'Lu'} handleOk={handleOk} handleCancel={handleCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} />
+              <AddBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={0} statut={'Wish'} handleOk={handleOk} handleCancel={handleCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} setStatut={function (str: string): void {
+                  throw new Error('Function not implemented.');
+                } } setNote={function (num: number): void {
+                  throw new Error('Function not implemented.');
+                } } />
             </View>
           }
         </View>
@@ -274,7 +278,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column-reverse',
     backgroundColor: 'transparent',
-    alignItems: 'center'
+    alignItems: 'center',
+    width: 400
   },
   buttonContainerQuestion: {
     flex: 1,
@@ -286,7 +291,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column-reverse',
     backgroundColor: 'transparent',
-    margin: 64,
+    margin: 10,
   },
   text: {
     fontSize: 18,
@@ -312,6 +317,7 @@ const styles = StyleSheet.create({
   listcontainer: {
     flex: 1,
     backgroundColor: 'transparent',
-    alignItems: 'center'
+    alignItems: 'center',
+    width: 400
   }
 });
