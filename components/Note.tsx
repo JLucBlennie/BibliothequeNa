@@ -22,5 +22,5 @@ const styles = StyleSheet.create({
     noteContainer: {
         flex: 5,
         flexDirection: 'row'
-    },
+    }
 });

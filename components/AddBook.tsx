@@ -62,7 +62,7 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
     return (
         <View style={stylesAddBook.container}>
             {scanned &&
-                <View>
+                <View style={{flex:5}}>
                     <Text style={stylesAddBook.textAdd}>Information à remplir :</Text>
                     <View style={{ paddingTop: 5, paddingBottom: 5 }}>
                         <TextInput
@@ -80,7 +80,7 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
                             defaultValue={authorName}
                         />
                     </View>
-                    <View style={{ paddingTop: 5, paddingBottom: 5, alignItems: 'center' }}>
+                    <View style={{ flex:2, flexDirection:'row', paddingTop: 5, paddingBottom: 5, alignItems: 'center' }}>
                         <ModalSelector
                             data={data}
                             initValue="Sélectionnez une option"
@@ -97,10 +97,8 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
                                 placeholder="Sélectionnez une option"
                                 value={selectedStatut}
                             />
-                        </ModalSelector>
-                        <View>
-                            <Note note={note} taille={18} />
-                        </View>
+                        </ModalSelector>                        
+                        <Note note={note} taille={18} />
                     </View>
                     <View style={{ paddingTop: 5, paddingBottom: 5 }}>
                         <Image source={imageTmp.uri} style={stylesAddBook.image} />
@@ -147,8 +145,9 @@ const stylesAddBook = StyleSheet.create({
         alignItems: 'center',
     },
     modalSelector: {
-        width: '80%',
-        marginBottom: 20,
+        width: '50%',
+        marginBottom: 5,
+        marginRight:5
     },
     initValueText: {
         color: '#555',
