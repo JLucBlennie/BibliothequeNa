@@ -23,8 +23,10 @@ export default function Index() {
   const [toAdd, setToAdd] = useState(false);
   const [titreLivre, setTitreLivre] = useState('');
   const [nomAuteur, setNomAuteur] = useState('');
+  const [noteLivre, setNoteLivre] = useState(0);
+  const [statutLivre, setStatutLivre] = useState('Lu');
   const [isbn, setISBN] = useState('');
-  const {bdd, setBdd} = useBiblothequeNAContext();
+  const { bdd, setBdd } = useBiblothequeNAContext();
   const [idBookToDelete, setIdBookToDelete] = useState(-1);
   const [idBookToEdit, setIdBookToEdit] = useState(-1);
   const [editBook, setEditBook] = useState(false);
@@ -139,6 +141,8 @@ export default function Index() {
     setToAdd(false);
     setTitreLivre('');
     setNomAuteur('');
+    setNoteLivre(0);
+    setStatutLivre('Lu');
   }
 
   function handleAjouter() {
@@ -150,7 +154,7 @@ export default function Index() {
     let idNewBook: number;
     idNewBook = bdd.length + 1;
     bdd.push({
-      "id": idNewBook, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": "4", "statut": "Lu"
+      "id": idNewBook, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": noteLivre.toString(), "statut": statutLivre
     });
     console.log(bdd);
     SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
@@ -164,6 +168,8 @@ export default function Index() {
       setToAdd(false);
       setTitreLivre('');
       setNomAuteur('');
+      setNoteLivre(0);
+      setStatutLivre('Lu');
     });
   }
 
@@ -184,6 +190,9 @@ export default function Index() {
         setIdBookToDelete(value.id);
         setTitreLivre(value.name);
         setNomAuteur(value.author);
+        setNoteLivre(parseInt(value.note));
+        setStatutLivre(value.statut);
+        setImagePath(value.image);
         setDelBook(true);
       }
     })
@@ -199,6 +208,11 @@ export default function Index() {
     bdd.splice(index, 1);
     SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
       console.log("Fichier rempli");
+      FileSystem.deleteAsync(imagePath).then(() => {
+        console.log("Fichier supprime : " + imagePath);
+      }).catch(err => {
+        console.log("Pb du delete " + imagePath + " : " + err);
+      });
     }).catch(err => {
       console.log("Pb : " + err);
     });
@@ -206,13 +220,16 @@ export default function Index() {
     setIdBookToDelete(-1);
     setTitreLivre('');
     setNomAuteur('');
+    setNoteLivre(0);
+    setStatutLivre('Lu');
+    setImagePath('');
   }
 
   return (
     <View style={styles.container}>
       <ImageBackground style={styles.imageContainer} source={PlaceholderImage}>
         {delBook &&
-          <QDeleteBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={2} statut={"Lu"} handleOK={() => { deleteBookFromBDD() }} handleCancel={function (): void {
+          <QDeleteBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={noteLivre} statut={statutLivre} handleOK={() => { deleteBookFromBDD() }} handleCancel={function (): void {
             setDelBook(false);
           }} />
         }
@@ -261,11 +278,7 @@ export default function Index() {
         }
         {
           !delBook && scanned && !alreadyRead && toAdd &&
-          <AddBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={0} statut={'Lu'} handleOk={handleOk} handleCancel={handleCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} setStatut={function (str: string): void {
-            throw new Error('Function not implemented.');
-          } } setNote={function (num: number): void {
-            throw new Error('Function not implemented.');
-          } } />
+          <AddBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={noteLivre} statut={statutLivre} handleOk={handleOk} handleCancel={handleCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} setStatut={setStatutLivre} setNote={setNoteLivre} />
         }
       </ImageBackground>
     </View>

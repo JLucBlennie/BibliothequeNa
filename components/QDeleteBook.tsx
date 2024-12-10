@@ -18,20 +18,20 @@ export default function QDeleteBook({ bookTitle, authorName, imagePath, note, st
     return (
         <View style={styles.container}>
             <Text style={styles.text}>Tu veux supprimer le livre ?</Text>
-            <View style={[styles.bookcard, styles.bookCardShadow]}>
-                <Image source={imageTmp} style={styles.image} />
-                <View>
-                    <Text style={styles.text}>Livre : {bookTitle}</Text>
-                    <Text style={styles.text}>Auteur : {authorName}</Text>
-                    <View style={styles.notestatut}>
-                        <Text style={styles.textstatut}>{statut}</Text>
-                        <Note note={note} />
-                    </View>
-                    <View style={styles.buttonContainerQuestion}>
-                        <CircleButton iconName="delete" onPress={handleOK} />
-                        <CircleButton iconName="cancel" onPress={handleCancel} />
-                    </View>
+            <View style={{ flex: 5, flexDirection: 'column' }}>
+                <Text style={styles.text}>Livre : {bookTitle}</Text>
+                <Text style={styles.text}>Auteur : {authorName}</Text>
+                <View style={styles.notestatut}>
+                    <Text style={styles.textstatut}>{statut}</Text>
+                    <Note note={note} taille={18} />
                 </View>
+                <View style={{ paddingTop: 5, paddingBottom: 5 }}>
+                    <Image source={imageTmp} style={styles.image} />
+                </View>
+            </View>
+            <View style={styles.buttonContainerQuestion}>
+                <CircleButton iconName="delete" onPress={handleOK} />
+                <CircleButton iconName="cancel" onPress={handleCancel} />
             </View>
         </View>
     );
@@ -39,33 +39,17 @@ export default function QDeleteBook({ bookTitle, authorName, imagePath, note, st
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#25292e',
+        flex: 3,
+        backgroundColor: 'transparent',
         alignItems: 'center',
     },
     image: {
-        width: 50,
-        borderRadius: 18,
+        height: 350,
+        borderRadius: 5,
     },
     notestatut: {
         flex: 2,
         flexDirection: 'row'
-    },
-    bookcard: {
-        flex: 2,
-        flexDirection: 'row',
-        backgroundColor: '#25292e99',
-        margin: 5,
-    },
-    bookCardShadow: {
-        shadowColor: "white",
-        shadowOffset: {
-            width: 5,
-            height: 5,
-        },
-        shadowOpacity: 0.29,
-        shadowRadius: 4.65,
-        elevation: 7,
     },
     text: {
         fontSize: 18,
