@@ -21,12 +21,12 @@ type Props = {
     setNote: (num: number) => void;
 };
 
-export default function AddBook({ bookTitle, authorName, imagePath, note, statut, handleOk, handleCancel, setTitreLivre, setNomAuteur, setImagePath, setStatut, setNote }: Props) {
+export default function EditBook({ bookTitle, authorName, imagePath, note, statut, handleOk, handleCancel, setTitreLivre, setNomAuteur, setImagePath, setStatut, setNote }: Props) {
     const [scanned, setScanned] = useState(true);
     const [imageTmp, setImageTmp] = useState({ uri: imagePath });
     const [selectedStatut, setSelectedStatut] = useState<string>(statut === '' ? 'Sélectionnez une option' : (statut === 'Wish' ? 'A Lire' : 'Lu'));
 
-    console.log("AddBook Statut : " + statut);
+    console.log("EditBook Statut : " + statut);
     const data = [
         { key: 1, label: 'Lu' },
         { key: 2, label: 'A Lire' }
@@ -64,7 +64,7 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
         <View style={stylesAddBook.container}>
             {scanned &&
                 <View style={{ flex: 5 }}>
-                    <Text style={stylesAddBook.textAdd}>Information à remplir :</Text>
+                    <Text style={stylesAddBook.textAdd}>Information à modifier :</Text>
                     <View style={{ paddingTop: 5, paddingBottom: 5 }}>
                         <TextInput
                             style={stylesAddBook.textinput}

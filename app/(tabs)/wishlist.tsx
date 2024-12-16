@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   imageContainer: {
-    flex: 1,
+    flex: 2,
     resizeMode: 'cover',
     justifyContent: 'center',
   },
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     backgroundColor: 'transparent',
-    width: 400
+    width: '100%'
   },
   camera: {
     flex: 1,
@@ -288,11 +288,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonContainer: {
-    flex: 1,
-    flexDirection: 'column-reverse',
+    position: 'absolute',
     backgroundColor: 'transparent',
     alignItems: 'center',
-    width: 400
+    bottom: 20,
+    right: 20
   },
   buttonContainerQuestion: {
     flex: 1,
@@ -330,7 +330,6 @@ const styles = StyleSheet.create({
   listcontainer: {
     flex: 1,
     backgroundColor: 'transparent',
-    alignItems: 'center',
-    width: 400
+    alignItems: 'center'
   }
 });
