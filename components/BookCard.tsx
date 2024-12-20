@@ -1,9 +1,6 @@
-import { StyleSheet, View, Text, TextInput } from 'react-native';
-import { Image, type ImageSource } from 'expo-image';
-import { Asset } from "expo-asset";
-import { useState } from 'react';
+import { StyleSheet, View, Text } from 'react-native';
+import { Image } from 'expo-image';
 import Note from '@/components/Note';
-import { CameraView, CameraType, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 
 
 type Props = {

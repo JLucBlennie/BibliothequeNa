@@ -1,10 +1,10 @@
 import { StyleSheet, View, Text, TextInput } from 'react-native';
-import { Image, type ImageSource } from 'expo-image';
+import { Image } from 'expo-image';
 import { useState } from 'react';
 import CircleButton from '@/components/CircleButton';
-import { CameraView, CameraType, useCameraPermissions, CameraCapturedPicture } from 'expo-camera';
 import ModalSelector from 'react-native-modal-selector';
 import Note from '@/components/Note';
+import BookCamera from './BookCamera';
 
 type Props = {
     bookTitle: string;
@@ -32,8 +32,6 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
         { key: 2, label: 'A Lire' }
     ];
 
-    let camera: CameraView;
-
     function handleCancelCamera() {
         setScanned(true);
     }
@@ -46,18 +44,10 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
             setStatut('Wish');
         }
     }
-
-    const handleOkImage = async () => {
-        console.log("Prise de photo...");
-        if (!camera) return
-        await camera.takePictureAsync().then((photo) => {
-            if (photo !== undefined) {
-                console.log("Prise de la photo ==> " + photo.uri);
-                setImagePath(photo.uri);
-                setImageTmp(photo);
-                setScanned(true);
-            }
-        })
+    function handleImageDone(imgPath : string) {
+        console.log("HandleImageDone chemin ==> " + imgPath);
+        setImageTmp({ uri: imgPath});
+        console.log("HandleImagedone Photo ==> " + imageTmp.uri);
     }
 
     return (
@@ -108,19 +98,7 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
             }
             {
                 !scanned &&
-                <View style={stylesAddBook.container}>
-                    <CameraView facing='back' ref={(r) => {
-                        if (r !== null)
-                            camera = r
-                    }}>
-                        <View style={stylesAddBook.buttonbottomplaced}>
-                            <View style={stylesAddBook.buttonCameraContainer}>
-                                <CircleButton iconName="check" onPress={handleOkImage} />
-                                <CircleButton iconName="cancel" onPress={handleCancelCamera} />
-                            </View>
-                        </View>
-                    </CameraView>
-                </View>
+                <BookCamera handleImageDone={handleImageDone} handleCancelCamera={handleCancelCamera} setImagePath={setImagePath} setScanned={setScanned} />
             }
             {
                 (scanned && imageTmp.uri.length === 0) &&
@@ -131,8 +109,8 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
             {
                 scanned &&
                 <View style={stylesAddBook.buttonContainerAdd}>
-                    <CircleButton iconName="check" onPress={handleOk} />
-                    <CircleButton iconName="cancel" onPress={handleCancel} />
+                    <CircleButton iconName="check" onPress={handleOk} position={'Left'} />
+                    <CircleButton iconName="cancel" onPress={handleCancel} position={'Right'} />
                 </View>
             }
         </View >

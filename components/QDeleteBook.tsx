@@ -30,8 +30,8 @@ export default function QDeleteBook({ bookTitle, authorName, imagePath, note, st
                 </View>
             </View>
             <View style={styles.buttonContainerQuestion}>
-                <CircleButton iconName="delete" onPress={handleOK} />
-                <CircleButton iconName="cancel" onPress={handleCancel} />
+                <CircleButton iconName="delete" onPress={handleOK} position={'Left'} />
+                <CircleButton iconName="cancel" onPress={handleCancel} position={'Right'} />
             </View>
         </View>
     );

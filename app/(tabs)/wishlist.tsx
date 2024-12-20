@@ -1,16 +1,18 @@
-import { Pressable, ImageBackground, StyleSheet, View, Text, TextInput, Alert, FlatList } from 'react-native';
-import { CameraView, CameraType, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
-import { useState, useContext } from 'react';
+import { ImageBackground, StyleSheet, View, Text, Alert, Dimensions } from 'react-native';
+import { useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
+import { useState } from 'react';
 import { Asset } from "expo-asset";
 import * as FileSystem from 'expo-file-system';
 import CircleButton from '@/components/CircleButton';
 import AddBook from '@/components/AddBook';
 import QDeleteBook from '@/components/QDeleteBook';
-import BookCard from '@/components/BookCard';
 import Button from '@/components/Button';
 import * as SecureStore from 'expo-secure-store';
-import bddJSONFirst from '@/assets/data/bibna.json';
 import { useBiblothequeNAContext } from '@/hooks/BibliothequeNAContext';
+import BookList from '@/components/BookList';
+import BookISBNCamera from '@/components/BookISBNCamera';
+import QToAddBook from '@/components/QToAddBook';
+const { width } = Dimensions.get('window');
 
 const PlaceholderImage = { uri: Asset.fromModule(require('@/assets/images/background.png')).uri };
 
@@ -199,54 +201,32 @@ export default function WishList() {
 
   return (
     <View style={styles.container}>
-      <ImageBackground style={styles.imageContainer} source={PlaceholderImage}>
+      <ImageBackground style={[{ width: width }, styles.imageContainer]} source={PlaceholderImage}>
         <View style={styles.listcontainer}>
           {delBook &&
             <QDeleteBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={noteLivre} statut={statutLivre} handleOK={() => { deleteBookFromBDD() }} handleCancel={function (): void {
               setDelBook(false);
             }} />
-          }{!delBook && scanned && alreadyWished && <View style={styles.listcontainer}>
-            <Text style={styles.listTitle}>
-              Mes Livres à lire :
-            </Text>
-            <FlatList
-              style={styles.flatlist}
-              data={bdd}
-              showsVerticalScrollIndicator={false}
-              renderItem={({ item }) =>
-                item.statut === "Wish" ? <View ><Pressable onPress={() => { openBookCard(item.id) }} onLongPress={() => { deleteBook(item.id) }}><BookCard bookTitle={item.name} authorName={item.author} imagePath={item.image} note={parseInt(item.note)} statut={item.statut} /></Pressable></View> : <View />
-              }
-              keyExtractor={(item, index) => index.toString()}
-            />
-          </View>
           }
-          {!delBook && !scanned && <View >
-            <CameraView facing='back' barcodeScannerSettings={{
-              barcodeTypes: ["ean13"],
-            }} onBarcodeScanned={scanned ? undefined : scannedCode}>
-              <View style={styles.buttonCameraContainer}>
-                <CircleButton iconName="cancel" onPress={handleCancelCamera} />
-              </View>
-            </CameraView>
-          </View>
+          {!delBook && scanned && alreadyWished &&
+            <BookList bdd={bdd} filtre={'Wish'} openBookCard={(id) => openBookCard(id)} deleteBook={(id) => deleteBook(id)} />
+          }
+          {!delBook && !scanned &&
+            <BookISBNCamera scanned={scanned} scannedCode={scannedCode} handleCancelCamera={handleCancelCamera} />
           }
           {
-            !delBook && scanned && alreadyWished && <View style={styles.buttonContainer}><CircleButton iconName="camera" onPress={() => setScanned(false)} /></View>
-          }
-          {
-            !delBook && scanned && !alreadyWished && !toAdd && <View style={styles.container}>
-              <Text style={styles.text}>Tu veux l'ajouter dans ta liste des livres lus ?</Text>
-              <View style={styles.buttonContainerQuestion}>
-                <CircleButton iconName="check" onPress={handleAjouter} />
-                <CircleButton iconName="cancel" onPress={handleNePasAjouter} />
-              </View>
+            !delBook && scanned && alreadyWished &&
+            <View style={styles.buttonContainer}>
+              <CircleButton iconName="camera" onPress={() => setScanned(false)} />
             </View>
+          }
+          {
+            !delBook && scanned && !alreadyWished && !toAdd &&
+            <QToAddBook statut={'Wish'} handleAjouter={handleAjouter} handleNePasAjouter={handleNePasAjouter} />
           }
           {
             !delBook && scanned && !alreadyWished && toAdd &&
-            <View style={styles.container}>
-              <AddBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={noteLivre} statut={statutLivre} handleOk={handleOk} handleCancel={handleCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} setStatut={setStatutLivre} setNote={setNoteLivre} />
-            </View>
+            <AddBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={noteLivre} statut={statutLivre} handleOk={handleOk} handleCancel={handleCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} setStatut={setStatutLivre} setNote={setNoteLivre} />
           }
         </View>
       </ImageBackground>
@@ -276,8 +256,9 @@ const styles = StyleSheet.create({
   },
   cameraContainer: {
     flex: 1,
-    flexDirection: 'row',
     backgroundColor: 'transparent',
+    resizeMode: 'cover',
+    justifyContent: 'center',
     width: '100%'
   },
   camera: {
@@ -290,7 +271,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     position: 'absolute',
     backgroundColor: 'transparent',
-    alignItems: 'center',
     bottom: 20,
     right: 20
   },
@@ -301,10 +281,10 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   buttonCameraContainer: {
-    flex: 1,
-    flexDirection: 'column-reverse',
+    position: 'absolute',
     backgroundColor: 'transparent',
-    margin: 10,
+    bottom: 20,
+    left: 150
   },
   text: {
     fontSize: 18,

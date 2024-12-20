@@ -1,17 +1,20 @@
-import { ImageBackground, StyleSheet, View, Text, TextInput, Alert, FlatList, Pressable, Dimensions } from 'react-native';
-import { CameraView, CameraType, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
-import { useState, useContext, useEffect } from 'react';
+import { ImageBackground, StyleSheet, View, Text, Alert, Dimensions } from 'react-native';
+import { useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
+import { useState } from 'react';
 import { Asset } from "expo-asset";
 import * as FileSystem from 'expo-file-system';
 import { File, Paths } from 'expo-file-system/next';
+import * as SecureStore from 'expo-secure-store';
 import CircleButton from '@/components/CircleButton';
 import AddBook from '@/components/AddBook';
 import QDeleteBook from '@/components/QDeleteBook';
-import BookCard from '@/components/BookCard';
 import Button from '@/components/Button';
-import * as SecureStore from 'expo-secure-store';
 import { useBiblothequeNAContext } from '@/hooks/BibliothequeNAContext';
 import EditBook from '@/components/EditBook';
+import BookList from '@/components/BookList';
+import BookISBNCamera from '@/components/BookISBNCamera';
+import QToAddBook from '@/components/QToAddBook';
+const { width } = Dimensions.get('window');
 
 const PlaceholderImage = { uri: Asset.fromModule(require('@/assets/images/background.png')).uri };
 
@@ -32,7 +35,6 @@ export default function Index() {
   const [idBookToEdit, setIdBookToEdit] = useState(-1);
   const [editBook, setEditBook] = useState(false);
   const [delBook, setDelBook] = useState(false);
-  const { width } = Dimensions.get('window');
 
   if (firstLaunch) {
     SecureStore.getItemAsync("bdd").then((value: string | null) => {
@@ -41,6 +43,13 @@ export default function Index() {
         setBdd(JSON.parse(value));
       console.log("Index : ReadBDD ==> ");
       console.log(bdd);
+      // SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
+      //   console.log("Fichier rempli");
+      //   const filePath = saveBDD();
+      //   console.log("BDD sauvee... " + filePath);
+      // }).catch(err => {
+      //   console.log("Pb : " + err);
+      // });
     });
     setFirstLaunch(false);
   }
@@ -146,6 +155,17 @@ export default function Index() {
     setNomAuteur('');
     setNoteLivre(0);
     setStatutLivre('Lu');
+  }
+
+  function handleModifyCancel() {
+    setAlreadyRead(true);
+    setToAdd(false);
+    setTitreLivre('');
+    setNomAuteur('');
+    setNoteLivre(0);
+    setStatutLivre('Lu');
+    setIdBookToEdit(-1);
+    setEditBook(false);
   }
 
   function handleAjouter() {
@@ -265,38 +285,17 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <ImageBackground style={styles.imageContainer} source={PlaceholderImage}>
+      <ImageBackground style={[{ width: width }, styles.imageContainer]} source={PlaceholderImage}>
         {delBook && !editBook &&
           <QDeleteBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={noteLivre} statut={statutLivre} handleOK={() => { deleteBookFromBDD() }} handleCancel={function (): void {
             setDelBook(false);
           }} />
         }
         {!delBook && !editBook && scanned && alreadyRead &&
-          <View style={styles.listcontainer}>
-            <Text style={styles.listTitle}>
-              Mes Livres :
-            </Text>
-            <FlatList
-              style={styles.flatlist}
-              data={bdd}
-              showsVerticalScrollIndicator={true}
-              renderItem={({ item }) =>
-                item.statut !== "Wish" ? <View ><Pressable onPress={() => { openBookCard(item.id) }} onLongPress={() => { deleteBook(item.id) }}><BookCard bookTitle={item.name} authorName={item.author} imagePath={item.image} note={parseInt(item.note)} statut={item.statut} /></Pressable></View> : <View />
-              }
-              keyExtractor={(item, index) => index.toString()}
-            />
-          </View>
+          <BookList bdd={bdd} filtre={'Lu'} openBookCard={(id) => openBookCard(id)} deleteBook={(id) => deleteBook(id)} />
         }
         {!delBook && !editBook && !scanned &&
-          <View style={styles.cameraContainer}>
-            <CameraView style={{ width: width, height: '100%' }} facing='back' barcodeScannerSettings={{
-              barcodeTypes: ["ean13"],
-            }} onBarcodeScanned={scanned ? undefined : scannedCode}>
-              <View style={styles.buttonCameraContainer}>
-                <CircleButton iconName="cancel" onPress={handleCancelCamera} />
-              </View>
-            </CameraView>
-          </View>
+          <BookISBNCamera scanned={scanned} scannedCode={scannedCode} handleCancelCamera={handleCancelCamera} />
         }
         {
           !delBook && !editBook && scanned && alreadyRead &&
@@ -306,13 +305,7 @@ export default function Index() {
         }
         {
           !delBook && !editBook && scanned && !alreadyRead && !toAdd &&
-          <View style={styles.containerQuestion}>
-            <Text style={styles.text}>Tu veux l'ajouter dans ta liste des livres lus ?</Text>
-            <View style={styles.buttonContainerQuestion}>
-              <CircleButton iconName="check" onPress={handleAjouter} />
-              <CircleButton iconName="cancel" onPress={handleNePasAjouter} />
-            </View>
-          </View>
+          <QToAddBook statut={'Wish'} handleAjouter={handleAjouter} handleNePasAjouter={handleNePasAjouter} />
         }
         {
           !delBook && !editBook && scanned && !alreadyRead && toAdd &&
@@ -320,10 +313,10 @@ export default function Index() {
         }
         {
           editBook &&
-          <EditBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={noteLivre} statut={statutLivre} handleOk={handleModifyOk} handleCancel={handleCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} setStatut={setStatutLivre} setNote={setNoteLivre} />
+          <EditBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={noteLivre} statut={statutLivre} handleOk={handleModifyOk} handleCancel={handleModifyCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} setStatut={setStatutLivre} setNote={setNoteLivre} />
         }
       </ImageBackground>
-    </View>
+    </View >
   );
 }
 
@@ -343,7 +336,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   imageContainer: {
-    flex: 2,
+    flex: 1,
     resizeMode: 'cover',
     justifyContent: 'center',
   },
