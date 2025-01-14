@@ -5,6 +5,7 @@ import CircleButton from '@/components/CircleButton';
 import { CameraView, CameraType, useCameraPermissions, CameraCapturedPicture } from 'expo-camera';
 import ModalSelector from 'react-native-modal-selector';
 import Note from '@/components/Note';
+import * as ImagePicker from 'expo-image-picker';
 
 type Props = {
     bookTitle: string;
@@ -33,6 +34,24 @@ export default function EditBook({ bookTitle, authorName, imagePath, note, statu
     ];
 
     let camera: CameraView;
+
+    const pickImageAsync = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          allowsEditing: true,
+          quality: 1,
+        });
+    
+        if (!result.canceled) {
+          console.log(result);
+          console.log("Prise de la photo ==> " + result.assets[0].uri);
+                setImagePath(result.assets[0].uri);
+                setImageTmp(result.assets[0]);
+                setScanned(true);
+        } else {
+          alert('You did not select any image.');
+        }
+      };
 
     function handleCancelCamera() {
         setScanned(true);
@@ -125,7 +144,8 @@ export default function EditBook({ bookTitle, authorName, imagePath, note, statu
             {
                 (scanned && imageTmp.uri.length === 0) &&
                 <View style={stylesAddBook.buttonContainer}>
-                    <CircleButton iconName="camera" onPress={() => setScanned(false)} />
+                    <CircleButton iconName="image" onPress={pickImageAsync} position={'Left'} />
+                    <CircleButton iconName="camera" onPress={() => setScanned(false)} position={'Right'} />
                 </View>
             }
             {
@@ -195,11 +215,13 @@ const stylesAddBook = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         backgroundColor: 'transparent',
+        paddingBottom: 10
     },
     buttonContainer: {
         flex: 1,
         flexDirection: 'row',
         backgroundColor: 'transparent',
+        paddingBottom: 10
     },
     buttonCameraContainer: {
         flex: 1,

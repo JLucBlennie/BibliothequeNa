@@ -32,6 +32,10 @@ export default function CircleButton({ iconName, onPress, position }: Props) {
                         iconName === "delete" &&
                         <MaterialIcons name="delete" size={38} color="#25292e" />
                     }
+                    {
+                        iconName === "image" &&
+                        <MaterialIcons name="image" size={38} color="#25292e" />
+                    }
                 </Pressable>
             </View>
         </View>

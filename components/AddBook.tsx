@@ -5,6 +5,7 @@ import CircleButton from '@/components/CircleButton';
 import ModalSelector from 'react-native-modal-selector';
 import Note from '@/components/Note';
 import BookCamera from './BookCamera';
+import * as ImagePicker from 'expo-image-picker';
 
 type Props = {
     bookTitle: string;
@@ -36,6 +37,24 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
         setScanned(true);
     }
 
+    const pickImageAsync = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          allowsEditing: true,
+          quality: 1,
+        });
+    
+        if (!result.canceled) {
+          console.log(result);
+          console.log("Prise de la photo ==> " + result.assets[0].uri);
+                setImagePath(result.assets[0].uri);
+                setImageTmp(result.assets[0]);
+                setScanned(true);
+        } else {
+          alert('You did not select any image.');
+        }
+      };
+
     function onChangeStatut(value: string) {
         setSelectedStatut(value);
         if (value === 'Lu') {
@@ -44,9 +63,9 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
             setStatut('Wish');
         }
     }
-    function handleImageDone(imgPath : string) {
+    function handleImageDone(imgPath: string) {
         console.log("HandleImageDone chemin ==> " + imgPath);
-        setImageTmp({ uri: imgPath});
+        setImageTmp({ uri: imgPath });
         console.log("HandleImagedone Photo ==> " + imageTmp.uri);
     }
 
@@ -103,7 +122,8 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
             {
                 (scanned && imageTmp.uri.length === 0) &&
                 <View style={stylesAddBook.buttonContainer}>
-                    <CircleButton iconName="camera" onPress={() => setScanned(false)} />
+                    <CircleButton iconName="image" onPress={pickImageAsync} position={'Left'} />
+                    <CircleButton iconName="camera" onPress={() => setScanned(false)} position={'Right'} />
                 </View>
             }
             {
@@ -173,11 +193,13 @@ const stylesAddBook = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         backgroundColor: 'transparent',
+        paddingBottom: 10
     },
     buttonContainer: {
         flex: 1,
         flexDirection: 'row',
         backgroundColor: 'transparent',
+        paddingBottom: 10
     },
     buttonCameraContainer: {
         flex: 1,

@@ -12,6 +12,7 @@ import { useBiblothequeNAContext } from '@/hooks/BibliothequeNAContext';
 import BookList from '@/components/BookList';
 import BookISBNCamera from '@/components/BookISBNCamera';
 import QToAddBook from '@/components/QToAddBook';
+import EditBook from '@/components/EditBook';
 const { width } = Dimensions.get('window');
 
 const PlaceholderImage = { uri: Asset.fromModule(require('@/assets/images/background.png')).uri };
@@ -123,6 +124,18 @@ export default function WishList() {
     setStatutLivre('Wish');
   }
 
+  function handleModifyCancel() {
+    setAlreadyWished(true);
+    setToAdd(false);
+    setTitreLivre('');
+    setNomAuteur('');
+    setNoteLivre(0);
+    setStatutLivre('Wish');
+    setIdBookToEdit(-1);
+    setEditBook(false);
+  }
+
+
   function handleAjouter() {
     setToAdd(true);
   }
@@ -148,11 +161,48 @@ export default function WishList() {
     setStatutLivre('Wish');
   }
 
+  function handleModifyOk() {
+    console.log("modifier le livre : " + titreLivre + " de " + nomAuteur);
+    var index: number = bdd.findIndex((item, i) => {
+      if (item.id === idBookToEdit)
+        return i;
+    });
+    console.log("Edit Book : " + titreLivre + " -> index : " + index);
+    bdd.splice(index, 1, {
+      "id": idBookToEdit, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": noteLivre.toString(), "statut": statutLivre
+    });
+    SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
+      console.log("Fichier rempli");
+    }).catch(err => {
+      console.log("Pb : " + err);
+    }).finally(() => {
+      setEditBook(false);
+      setTitreLivre('');
+      setNomAuteur('');
+      setNoteLivre(0);
+      setStatutLivre('Wish');
+      setIdBookToEdit(-1);
+    });
+  }
+
   function handleCancelCamera() {
     setScanned(true);
   }
+
   function openBookCard(id: number) {
     console.log("ouverture de la carte : " + id);
+    bdd.forEach((value: { id: number; isbn: string; name: string; author: string; image: string; note: string; statut: string; }) => {
+      if (value.id === id) {
+        console.log("Modification du livre : " + value.name);
+        setTitreLivre(value.name);
+        setNomAuteur(value.author);
+        setNoteLivre(parseInt(value.note));
+        setStatutLivre(value.statut);
+        setImagePath(value.image);
+        setIdBookToEdit(id);
+        setEditBook(true);
+      }
+    })
   }
 
   function deleteBook(idBook: number) {
@@ -208,25 +258,29 @@ export default function WishList() {
               setDelBook(false);
             }} />
           }
-          {!delBook && scanned && alreadyWished &&
+          {!delBook && !editBook && scanned && alreadyWished &&
             <BookList bdd={bdd} filtre={'Wish'} openBookCard={(id) => openBookCard(id)} deleteBook={(id) => deleteBook(id)} />
           }
           {!delBook && !scanned &&
             <BookISBNCamera scanned={scanned} scannedCode={scannedCode} handleCancelCamera={handleCancelCamera} />
           }
           {
-            !delBook && scanned && alreadyWished &&
+            !delBook && !editBook && scanned && alreadyWished &&
             <View style={styles.buttonContainer}>
               <CircleButton iconName="camera" onPress={() => setScanned(false)} />
             </View>
           }
           {
-            !delBook && scanned && !alreadyWished && !toAdd &&
+            !delBook && !editBook && scanned && !alreadyWished && !toAdd &&
             <QToAddBook statut={'Wish'} handleAjouter={handleAjouter} handleNePasAjouter={handleNePasAjouter} />
           }
           {
-            !delBook && scanned && !alreadyWished && toAdd &&
+            !delBook && !editBook && scanned && !alreadyWished && toAdd &&
             <AddBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={noteLivre} statut={statutLivre} handleOk={handleOk} handleCancel={handleCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} setStatut={setStatutLivre} setNote={setNoteLivre} />
+          }
+          {
+            editBook &&
+            <EditBook bookTitle={titreLivre} authorName={nomAuteur} imagePath={imagePath} note={noteLivre} statut={statutLivre} handleOk={handleModifyOk} handleCancel={handleModifyCancel} setImagePath={setImagePath} setNomAuteur={setNomAuteur} setTitreLivre={setTitreLivre} setStatut={setStatutLivre} setNote={setNoteLivre} />
           }
         </View>
       </ImageBackground>
@@ -250,7 +304,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   imageContainer: {
-    flex: 2,
+    flex: 1,
     resizeMode: 'cover',
     justifyContent: 'center',
   },
