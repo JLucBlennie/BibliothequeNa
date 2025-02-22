@@ -134,8 +134,8 @@ export default function EditBook({ bookTitle, authorName, imagePath, note, statu
                     }}>
                         <View style={stylesAddBook.buttonbottomplaced}>
                             <View style={stylesAddBook.buttonCameraContainer}>
-                                <View style={{ paddingRight: 50 }}><CircleButton iconName="check" onPress={handleOkImage} /></View>
-                                <View style={{ paddingLeft: 50 }}><CircleButton iconName="cancel" onPress={handleCancelCamera} /></View>
+                                <CircleButton iconName="check" onPress={handleOkImage} position={'Left'} />
+                                <CircleButton iconName="cancel" onPress={handleCancelCamera} position={'Right'} />
                             </View>
                         </View>
                     </CameraView>
@@ -151,8 +151,8 @@ export default function EditBook({ bookTitle, authorName, imagePath, note, statu
             {
                 scanned &&
                 <View style={stylesAddBook.buttonContainerAdd}>
-                    <View style={{ paddingRight: 50 }}><CircleButton iconName="check" onPress={handleOk} /></View>
-                    <View style={{ paddingLeft: 50 }}><CircleButton iconName="cancel" onPress={handleCancel} /></View>
+                    <CircleButton iconName="check" onPress={handleOk} position={'Left'} />
+                    <CircleButton iconName="cancel" onPress={handleCancel} position={'Right'} />
                 </View>
             }
         </View >

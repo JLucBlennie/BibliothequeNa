@@ -98,16 +98,17 @@ export default function WishList() {
       }
     });
     if (livreTrouve) {
-      if (livreInWishList)
+      if (livreInWishList) {
         Alert.alert("Tu l'as déjà dans la Wish List !!!");
-      else
+        setAlreadyWished(true);
+      } else {
         Alert.alert("Tu l'as déjà Lu !!!");
-      setAlreadyWished(true);
+      }
     } else {
       setAlreadyWished(false);
       console.log("Le livre n'a pas été lu encore... ==> " + scanningResult.data);
-      setISBN(scanningResult.data);
     }
+    setISBN(scanningResult.data);
   }
 
   function handleNePasAjouter() {
@@ -121,6 +122,8 @@ export default function WishList() {
     setTitreLivre('');
     setNomAuteur('');
     setNoteLivre(0);
+    setImagePath('');
+    setISBN('');
     setStatutLivre('Wish');
   }
 
@@ -131,6 +134,8 @@ export default function WishList() {
     setNomAuteur('');
     setNoteLivre(0);
     setStatutLivre('Wish');
+    setImagePath('');
+    setISBN('');
     setIdBookToEdit(-1);
     setEditBook(false);
   }
@@ -157,6 +162,8 @@ export default function WishList() {
     setToAdd(false);
     setTitreLivre('');
     setNomAuteur('');
+    setImagePath('');
+    setISBN('');
     setNoteLivre(0);
     setStatutLivre('Wish');
   }
@@ -180,6 +187,8 @@ export default function WishList() {
       setTitreLivre('');
       setNomAuteur('');
       setNoteLivre(0);
+      setImagePath('');
+      setISBN('');
       setStatutLivre('Wish');
       setIdBookToEdit(-1);
     });
@@ -193,7 +202,8 @@ export default function WishList() {
     console.log("ouverture de la carte : " + id);
     bdd.forEach((value: { id: number; isbn: string; name: string; author: string; image: string; note: string; statut: string; }) => {
       if (value.id === id) {
-        console.log("Modification du livre : " + value.name);
+        console.log("Modification du livre : ");
+        console.log(value);
         setTitreLivre(value.name);
         setNomAuteur(value.author);
         setNoteLivre(parseInt(value.note));
@@ -244,9 +254,10 @@ export default function WishList() {
     setIdBookToDelete(-1);
     setTitreLivre('');
     setNomAuteur('');
+    setImagePath('');
+    setISBN('');
     setNoteLivre(0);
     setStatutLivre('Wish');
-    setImagePath('');
   }
 
   return (

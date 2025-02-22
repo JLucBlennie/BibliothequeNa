@@ -123,7 +123,11 @@ export default function Index() {
     });
     let livreTrouve = false;
     let livreInWishList = false;
+    console.log("BDD = ");
+    console.log(bdd);
     bdd.map((item) => {
+      console.log("BDD Item : ");
+      console.log(item);
       console.log("ISBN de BDD = " + item.isbn + " vs ISBN Scanned = " + scanningResult.data);
       if (item.isbn === scanningResult.data || item.name === titreLivre) {
         livreTrouve = true;
@@ -131,16 +135,17 @@ export default function Index() {
       }
     });
     if (livreTrouve) {
-      if (livreInWishList)
+      if (livreInWishList) {
         Alert.alert("Tu l'as déjà dans la Wish List !!!");
-      else
+      } else {
         Alert.alert("Tu l'as déjà Lu !!!");
-      setAlreadyRead(true);
+        setAlreadyRead(true);
+      }
     } else {
       setAlreadyRead(false);
       console.log("Le livre n'a pas été lu encore... ==> " + scanningResult.data);
-      setISBN(scanningResult.data);
     }
+    setISBN(scanningResult.data);
   }
 
   function handleNePasAjouter() {
@@ -153,6 +158,8 @@ export default function Index() {
     setToAdd(false);
     setTitreLivre('');
     setNomAuteur('');
+    setImagePath('');
+    setISBN('');
     setNoteLivre(0);
     setStatutLivre('Lu');
   }
@@ -164,6 +171,8 @@ export default function Index() {
     setNomAuteur('');
     setNoteLivre(0);
     setStatutLivre('Lu');
+    setImagePath('');
+    setISBN('');
     setIdBookToEdit(-1);
     setEditBook(false);
   }
@@ -192,6 +201,8 @@ export default function Index() {
       setTitreLivre('');
       setNomAuteur('');
       setNoteLivre(0);
+      setImagePath('');
+      setISBN('');
       setStatutLivre('Lu');
     });
   }
@@ -214,6 +225,8 @@ export default function Index() {
       setTitreLivre('');
       setNomAuteur('');
       setNoteLivre(0);
+      setImagePath('');
+      setISBN('');
       setStatutLivre('Lu');
       setIdBookToEdit(-1);
     });
@@ -278,6 +291,8 @@ export default function Index() {
     setIdBookToDelete(-1);
     setTitreLivre('');
     setNomAuteur('');
+    setImagePath('');
+    setISBN('');
     setNoteLivre(0);
     setStatutLivre('Lu');
     setImagePath('');
