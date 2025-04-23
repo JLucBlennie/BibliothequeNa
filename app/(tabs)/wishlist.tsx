@@ -8,7 +8,7 @@ import AddBook from '@/components/AddBook';
 import QDeleteBook from '@/components/QDeleteBook';
 import Button from '@/components/Button';
 import * as SecureStore from 'expo-secure-store';
-import { useBiblothequeNAContext } from '@/hooks/BibliothequeNAContext';
+import { useBibliothequeNAContext } from '@/hooks/BibliothequeNAContext';
 import BookList from '@/components/BookList';
 import BookISBNCamera from '@/components/BookISBNCamera';
 import QToAddBook from '@/components/QToAddBook';
@@ -29,7 +29,7 @@ export default function WishList() {
   const [noteLivre, setNoteLivre] = useState(0);
   const [statutLivre, setStatutLivre] = useState('Wish');
   const [isbn, setISBN] = useState('');
-  const { bdd, setBdd } = useBiblothequeNAContext();
+  const { bdd, setBdd } = useBibliothequeNAContext();
   const [idBookToDelete, setIdBookToDelete] = useState(-1);
   const [idBookToEdit, setIdBookToEdit] = useState(-1);
   const [editBook, setEditBook] = useState(false);
@@ -75,22 +75,24 @@ export default function WishList() {
     console.log("Recherche dans Open Libray...");
     fetch("https://openlibrary.org/search.json?isbn=" + scanningResult.data + "&sort=new&fields=key,title,author").then((result) => {
       console.log("==> Resultat");
-      return result.json();
-    }).then((resultJson) => {
-      resultJson.docs.map((item: { title: any; author_name: any; }) => {
-        console.log(item.title + " --> From OpenLibrary...");
-        if (item.title !== undefined)
-          setTitreLivre(item.title);
-        console.log(item.author_name);
-        if (item.author_name !== undefined)
-          setNomAuteur(item.author_name);
+      result.json().then((resultJson) => {
+        resultJson.docs.map((item: { title: any; author_name: any; }) => {
+          console.log(item.title + " --> From OpenLibrary...");
+          if (item.title !== undefined)
+            setTitreLivre(item.title);
+          console.log(item.author_name);
+          if (item.author_name !== undefined)
+            setNomAuteur(item.author_name);
+        })
+      }).catch((err) => {
+        console.log("Pas de connexion à Open Libray..." + err);
       });
     }).catch((err) => {
       console.log("Pas de connexion à Open Libray..." + err);
     });
     let livreTrouve = false;
     let livreInWishList = false;
-    bdd.map((item) => {
+    bdd.map((item: { id: number; isbn: string; name: string; author: string; image: string; note: string; statut: string; comment: string; }) => {
       console.log("ISBN de BDD = " + item.isbn + " vs ISBN Scanned = " + scanningResult.data);
       if (item.isbn === scanningResult.data || item.name === titreLivre) {
         livreTrouve = true;
@@ -150,7 +152,7 @@ export default function WishList() {
     let idNewBook: number;
     idNewBook = bdd.length + 1;
     bdd.push({
-      "id": idNewBook, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": noteLivre.toString(), "statut": statutLivre
+      "id": idNewBook, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": noteLivre.toString(), "statut": statutLivre, "comment": ""
     });
     console.log(bdd);
     SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
@@ -170,13 +172,13 @@ export default function WishList() {
 
   function handleModifyOk() {
     console.log("modifier le livre : " + titreLivre + " de " + nomAuteur);
-    var index: number = bdd.findIndex((item, i) => {
+    var index: number = bdd.findIndex((item: { id: number; isbn: string; name: string; author: string; image: string; note: string; statut: string; comment: string; }, i: number) => {
       if (item.id === idBookToEdit)
         return i;
     });
     console.log("Edit Book : " + titreLivre + " -> index : " + index);
     bdd.splice(index, 1, {
-      "id": idBookToEdit, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": noteLivre.toString(), "statut": statutLivre
+      "id": idBookToEdit, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": noteLivre.toString(), "statut": statutLivre, "comment": ""
     });
     SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
       console.log("Fichier rempli");
@@ -234,7 +236,7 @@ export default function WishList() {
 
   function deleteBookFromBDD() {
     console.log("Delete Book : " + titreLivre + " -> idBookToDelete : " + idBookToDelete);
-    var index: number = bdd.findIndex((item, i) => {
+    var index: number = bdd.findIndex((item: { id: number; isbn: string; name: string; author: string; image: string; note: string; statut: string; comment: string; }, i: number) => {
       if (item.id === idBookToDelete)
         return i;
     });

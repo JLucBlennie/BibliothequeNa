@@ -10,31 +10,32 @@ export type bddType = {
     image: string;
     note: string;
     statut: string;
+    comment: string;
 }[];
 
-interface BiblothequeNAContextType {
+interface BibliothequeNAContextType {
     bdd: bddType;
     setBdd: (value: bddType) => void;
 }
 
-const BiblothequeNAContext = createContext<BiblothequeNAContextType | undefined>(undefined);
+const BibliothequeNAContext = createContext<BibliothequeNAContextType | undefined>(undefined);
 
 // Provider
-export const BiblothequeNAProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const BibliothequeNAProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [bdd, setBdd] = useState<bddType>(bddJSONFirst);
 
     return (
-        <BiblothequeNAContext.Provider value={{ bdd, setBdd }}>
+        <BibliothequeNAContext.Provider value={{ bdd, setBdd }}>
             {children}
-        </BiblothequeNAContext.Provider>
+        </BibliothequeNAContext.Provider>
     );
 };
 
 // Hook pour utiliser le contexte
-export const useBiblothequeNAContext = (): BiblothequeNAContextType => {
-    const context = useContext(BiblothequeNAContext);
+export const useBibliothequeNAContext = (): BibliothequeNAContextType => {
+    const context = useContext(BibliothequeNAContext);
     if (!context) {
-        throw new Error("useMyContext must be used within a BiblothequeNAProvider");
+        throw new Error("useMyContext must be used within a BibliothequeNAProvider");
     }
     return context;
 };

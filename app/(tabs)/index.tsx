@@ -9,7 +9,7 @@ import CircleButton from '@/components/CircleButton';
 import AddBook from '@/components/AddBook';
 import QDeleteBook from '@/components/QDeleteBook';
 import Button from '@/components/Button';
-import { useBiblothequeNAContext } from '@/hooks/BibliothequeNAContext';
+import { useBibliothequeNAContext } from '@/hooks/BibliothequeNAContext';
 import EditBook from '@/components/EditBook';
 import BookList from '@/components/BookList';
 import BookISBNCamera from '@/components/BookISBNCamera';
@@ -30,7 +30,7 @@ export default function Index() {
   const [noteLivre, setNoteLivre] = useState(0);
   const [statutLivre, setStatutLivre] = useState('Lu');
   const [isbn, setISBN] = useState('');
-  const { bdd, setBdd } = useBiblothequeNAContext();
+  const { bdd, setBdd } = useBibliothequeNAContext();
   const [idBookToDelete, setIdBookToDelete] = useState(-1);
   const [idBookToEdit, setIdBookToEdit] = useState(-1);
   const [editBook, setEditBook] = useState(false);
@@ -40,16 +40,30 @@ export default function Index() {
     SecureStore.getItemAsync("bdd").then((value: string | null) => {
       console.log("Index : Valeur stockée = " + value);
       if (value !== null)
-        setBdd(JSON.parse(value));
-      console.log("Index : ReadBDD ==> ");
+        // setBdd(JSON.parse(value));
+        console.log("Index : ReadBDD ==> ");
       console.log(bdd);
-      // SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
-      //   console.log("Fichier rempli");
-      //   const filePath = saveBDD();
-      //   console.log("BDD sauvee... " + filePath);
-      // }).catch(err => {
-      //   console.log("Pb : " + err);
-      // });
+    });
+    console.log("==> connexion au server ...");
+    fetch("http://51.83.78.37:9090/bibna", {
+      method: "GET",
+      //   headers: {
+      //     "Content-Type": "application/json; charset=utf-8",
+      //     Accept: "*/*",
+      //     "Cache-Control": "no-cache",
+      //   }
+    }).then((response) => {
+      console.log("La réponse : ");
+      console.log(response);
+      console.log("Le contenu de la réponse : ");
+      response.json().then((json) => {
+        console.log(JSON.stringify(json));
+        setBdd(json);
+        console.log("Index : ReadBDD ==> ");
+        console.log(bdd);
+      });
+    }).catch((err) => {
+      console.error(err);
     });
     setFirstLaunch(false);
   }
@@ -108,15 +122,17 @@ export default function Index() {
     console.log("Recherche dans Open Libray...");
     fetch("https://openlibrary.org/search.json?isbn=" + scanningResult.data + "&sort=new&fields=key,title,author").then((result) => {
       console.log("==> Resultat");
-      return result.json();
-    }).then((resultJson) => {
-      resultJson.docs.map((item: { title: any; author_name: any; }) => {
-        console.log(item.title + " --> From OpenLibrary...");
-        if (item.title !== undefined)
-          setTitreLivre(item.title);
-        console.log(item.author_name);
-        if (item.author_name !== undefined)
-          setNomAuteur(item.author_name);
+      result.json().then((resultJson) => {
+        resultJson.docs.map((item: { title: any; author_name: any; }) => {
+          console.log(item.title + " --> From OpenLibrary...");
+          if (item.title !== undefined)
+            setTitreLivre(item.title);
+          console.log(item.author_name);
+          if (item.author_name !== undefined)
+            setNomAuteur(item.author_name);
+        })
+      }).catch((err) => {
+        console.log("Pas de connexion à Open Libray..." + err);
       });
     }).catch((err) => {
       console.log("Pas de connexion à Open Libray..." + err);
@@ -186,7 +202,7 @@ export default function Index() {
     let idNewBook: number;
     idNewBook = bdd.length + 1;
     bdd.push({
-      "id": idNewBook, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": noteLivre.toString(), "statut": statutLivre
+      "id": idNewBook, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": noteLivre.toString(), "statut": statutLivre, "comment": ""
     });
     console.log(bdd);
     SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
@@ -214,7 +230,7 @@ export default function Index() {
     });
     console.log("Edit Book : " + titreLivre + " -> index : " + index);
     bdd.splice(index, 1, {
-      "id": idBookToEdit, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": noteLivre.toString(), "statut": statutLivre
+      "id": idBookToEdit, "isbn": isbn, "name": titreLivre, "author": nomAuteur, "image": imagePath, "note": noteLivre.toString(), "statut": statutLivre, "comment": ""
     });
     SecureStore.setItemAsync("bdd", JSON.stringify(bdd)).then(() => {
       console.log("Fichier rempli");

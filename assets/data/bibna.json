@@ -6,7 +6,8 @@
         "author": "Sophie TAL MEN",
         "image": "",
         "note": "4",
-        "statut": "Lu"
+        "statut": "Lu",
+        "comment": ""
     },
     {
         "id": 2,
@@ -15,6 +16,7 @@
         "author": "Sophie TAL MEN",
         "image": "",
         "note": "3",
+        "comment": "",
         "statut": "Lu"
     }
 ]
