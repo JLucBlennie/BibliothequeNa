@@ -12,9 +12,6 @@ type Props = {
 export default function BookList({ bdd, filtre, openBookCard, deleteBook }: Props) {
     return (
         <View style={styles.listcontainer}>
-            <Text style={styles.listTitle}>
-                Mes Livres :
-            </Text>
             <FlatList
                 style={styles.flatlist}
                 data={bdd}
