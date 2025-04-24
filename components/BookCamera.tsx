@@ -1,7 +1,6 @@
 import { StyleSheet, View, Dimensions } from 'react-native';
 import { CameraView } from 'expo-camera';
 import CircleButton from './CircleButton';
-import { useState } from 'react';
 const { width } = Dimensions.get('window');
 
 
@@ -19,7 +18,7 @@ export default function BookCamera({ handleImageDone, setImagePath, setScanned, 
     const handleOkImage = async () => {
         console.log("Prise de photo...");
         if (!camera) return
-        await camera.takePictureAsync().then((photo) => {
+        await camera.takePictureAsync({ shutterSound: false }).then((photo) => {
             if (photo !== undefined) {
                 console.log("Prise de la photo ==> " + photo.uri);
                 setImagePath(photo.uri);
