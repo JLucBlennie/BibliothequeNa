@@ -14,6 +14,7 @@ import EditBook from '@/components/EditBook';
 import BookList from '@/components/BookList';
 import BookISBNCamera from '@/components/BookISBNCamera';
 import QToAddBook from '@/components/QToAddBook';
+import ToggleFilter from '@/components/ToggleFilter';
 const { width } = Dimensions.get('window');
 
 const PlaceholderImage = { uri: Asset.fromModule(require('@/assets/images/background.png')).uri };
@@ -35,6 +36,7 @@ export default function Index() {
   const [idBookToEdit, setIdBookToEdit] = useState(-1);
   const [editBook, setEditBook] = useState(false);
   const [delBook, setDelBook] = useState(false);
+  const [filtreListe, setFiltreListe] = useState('Lu');
 
   if (firstLaunch) {
     SecureStore.getItemAsync("bdd").then((value: string | null) => {
@@ -198,7 +200,7 @@ export default function Index() {
   }
 
   function handleOk() {
-    console.log("ajouter le livre : " + titreLivre + " de " + nomAuteur);
+    console.log("ajouter le livre : " + titreLivre + " de " + nomAuteur + " ISBN " + isbn);
     let idNewBook: number;
     idNewBook = bdd.length + 1;
     bdd.push({
@@ -223,10 +225,12 @@ export default function Index() {
     });
   }
   function handleModifyOk() {
-    console.log("modifier le livre : " + titreLivre + " de " + nomAuteur);
+    console.log("modifier le livre : " + titreLivre + " de " + nomAuteur + " id " + idBookToEdit);
     var index: number = bdd.findIndex((item, i) => {
-      if (item.id === idBookToEdit)
-        return i;
+      if (item.id === idBookToEdit){
+        console.log("Livre trouvé : " + idBookToEdit)
+        return true;
+      }
     });
     console.log("Edit Book : " + titreLivre + " -> index : " + index);
     bdd.splice(index, 1, {
@@ -264,6 +268,7 @@ export default function Index() {
         setImagePath(value.image);
         setIdBookToEdit(id);
         setEditBook(true);
+        setISBN(value.isbn);
       }
     })
   }
@@ -314,6 +319,14 @@ export default function Index() {
     setImagePath('');
   }
 
+  function toggleFilter(){
+    if (filtreListe === 'Lu'){
+      setFiltreListe('Wish');
+    } else {
+      setFiltreListe('Lu');
+    }
+  }
+
   return (
     <View style={styles.container}>
       <ImageBackground style={[{ width: width }, styles.imageContainer]} source={PlaceholderImage}>
@@ -323,7 +336,10 @@ export default function Index() {
           }} />
         }
         {!delBook && !editBook && scanned && alreadyRead &&
-          <BookList bdd={bdd} filtre={'Lu'} openBookCard={(id) => openBookCard(id)} deleteBook={(id) => deleteBook(id)} />
+          <View style={styles.container}>
+            <ToggleFilter filtre={filtreListe} toggleFilter={() => toggleFilter()} />
+            <BookList bdd={bdd} filtre={filtreListe} openBookCard={(id) => openBookCard(id)} deleteBook={(id) => deleteBook(id)} />
+          </View>
         }
         {!delBook && !editBook && !scanned &&
           <BookISBNCamera scanned={scanned} scannedCode={scannedCode} handleCancelCamera={handleCancelCamera} />

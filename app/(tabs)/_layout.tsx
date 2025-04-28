@@ -20,10 +20,6 @@ export default function TabLayout() {
                     title: 'Ma bibliothèque', tabBarIcon: ({ color, focused }) => (
                         <Ionicons name={focused ? 'library-sharp' : 'library-outline'} color={color} size={24} />)
                 }} />
-                <Tabs.Screen name="wishlist" options={{
-                    title: 'Ma Wish List...', tabBarIcon: ({ color, focused }) => (
-                        <Ionicons name={focused ? 'list-sharp' : 'list-outline'} color={color} size={24} />)
-                }} />
                 <Tabs.Screen name="about" options={{
                     title: 'About', tabBarIcon: ({ color, focused }) => (
                         <Ionicons name={focused ? 'information-circle' : 'information-circle-outline'} color={color} size={24} />
