@@ -29,23 +29,18 @@ export default function Index() {
   const [titreLivre, setTitreLivre] = useState('');
   const [nomAuteur, setNomAuteur] = useState('');
   const [noteLivre, setNoteLivre] = useState(0);
-  const [statutLivre, setStatutLivre] = useState('Lu');
+  const [statutLivre, setStatutLivre] = useState('LU');
   const [isbn, setISBN] = useState('');
   const { bdd, setBdd } = useBibliothequeNAContext();
   const [idBookToDelete, setIdBookToDelete] = useState(-1);
   const [idBookToEdit, setIdBookToEdit] = useState(-1);
   const [editBook, setEditBook] = useState(false);
   const [delBook, setDelBook] = useState(false);
-  const [filtreListe, setFiltreListe] = useState('Lu');
+  const [filtreListe, setFiltreListe] = useState('LU');
 
+  console.log("Valeur de firstLaunch : " + firstLaunch);
   if (firstLaunch) {
-    SecureStore.getItemAsync("bdd").then((value: string | null) => {
-      console.log("Index : Valeur stockée = " + value);
-      if (value !== null)
-        // setBdd(JSON.parse(value));
-        console.log("Index : ReadBDD ==> ");
-      console.log(bdd);
-    });
+    console.log("On lance pour la 1ere fois...");
     console.log("==> connexion au server ...");
     fetch("http://51.83.78.37:9090/bibna", {
       method: "GET",
@@ -61,11 +56,18 @@ export default function Index() {
       response.json().then((json) => {
         console.log(JSON.stringify(json));
         setBdd(json);
-        console.log("Index : ReadBDD ==> ");
-        console.log(bdd);
       });
     }).catch((err) => {
+      console.log("Probleme de connexion...");
       console.error(err);
+      SecureStore.getItemAsync("bdd").then((value: string | null) => {
+        console.log("Index : Valeur stockée = " + value);
+        if (value !== null) {
+          console.log("Recuperation de la bdd...");
+          console.log(JSON.parse(value));
+          setBdd(JSON.parse(value));
+        }
+      });
     });
     setFirstLaunch(false);
   }
@@ -149,7 +151,7 @@ export default function Index() {
       console.log("ISBN de BDD = " + item.isbn + " vs ISBN Scanned = " + scanningResult.data);
       if (item.isbn === scanningResult.data || item.name === titreLivre) {
         livreTrouve = true;
-        livreInWishList = (item.statut === "Wish");
+        livreInWishList = (item.statut === "WISHLIST");
       }
     });
     if (livreTrouve) {
@@ -179,7 +181,7 @@ export default function Index() {
     setImagePath('');
     setISBN('');
     setNoteLivre(0);
-    setStatutLivre('Lu');
+    setStatutLivre('LU');
   }
 
   function handleModifyCancel() {
@@ -188,7 +190,7 @@ export default function Index() {
     setTitreLivre('');
     setNomAuteur('');
     setNoteLivre(0);
-    setStatutLivre('Lu');
+    setStatutLivre('LU');
     setImagePath('');
     setISBN('');
     setIdBookToEdit(-1);
@@ -221,13 +223,14 @@ export default function Index() {
       setNoteLivre(0);
       setImagePath('');
       setISBN('');
-      setStatutLivre('Lu');
+      setStatutLivre('LU');
     });
   }
+
   function handleModifyOk() {
     console.log("modifier le livre : " + titreLivre + " de " + nomAuteur + " id " + idBookToEdit);
     var index: number = bdd.findIndex((item, i) => {
-      if (item.id === idBookToEdit){
+      if (item.id === idBookToEdit) {
         console.log("Livre trouvé : " + idBookToEdit)
         return true;
       }
@@ -247,7 +250,7 @@ export default function Index() {
       setNoteLivre(0);
       setImagePath('');
       setISBN('');
-      setStatutLivre('Lu');
+      setStatutLivre('LU');
       setIdBookToEdit(-1);
     });
   }
@@ -315,16 +318,12 @@ export default function Index() {
     setImagePath('');
     setISBN('');
     setNoteLivre(0);
-    setStatutLivre('Lu');
+    setStatutLivre('LU');
     setImagePath('');
   }
 
-  function toggleFilter(){
-    if (filtreListe === 'Lu'){
-      setFiltreListe('Wish');
-    } else {
-      setFiltreListe('Lu');
-    }
+  function toggleFilter(value: string) {
+      setFiltreListe(value);
   }
 
   return (
@@ -337,7 +336,7 @@ export default function Index() {
         }
         {!delBook && !editBook && scanned && alreadyRead &&
           <View style={styles.container}>
-            <ToggleFilter filtre={filtreListe} toggleFilter={() => toggleFilter()} />
+            <ToggleFilter filtre={filtreListe} toggleFilter={(value) => toggleFilter(value)} />
             <BookList bdd={bdd} filtre={filtreListe} openBookCard={(id) => openBookCard(id)} deleteBook={(id) => deleteBook(id)} />
           </View>
         }
@@ -352,7 +351,7 @@ export default function Index() {
         }
         {
           !delBook && !editBook && scanned && !alreadyRead && !toAdd &&
-          <QToAddBook statut={'Wish'} handleAjouter={handleAjouter} handleNePasAjouter={handleNePasAjouter} />
+          <QToAddBook statut={'WHISHLIST'} handleAjouter={handleAjouter} handleNePasAjouter={handleNePasAjouter} />
         }
         {
           !delBook && !editBook && scanned && !alreadyRead && toAdd &&

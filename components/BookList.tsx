@@ -10,6 +10,7 @@ type Props = {
 };
 
 export default function BookList({ bdd, filtre, openBookCard, deleteBook }: Props) {
+    console.log("Le filtre : " + filtre);
     return (
         <View style={styles.listcontainer}>
             <FlatList
@@ -17,7 +18,13 @@ export default function BookList({ bdd, filtre, openBookCard, deleteBook }: Prop
                 data={bdd}
                 showsVerticalScrollIndicator={true}
                 renderItem={({ item }) =>
-                    item.statut === filtre ? <View ><Pressable onPress={() => { openBookCard(item.id) }} onLongPress={() => { deleteBook(item.id) }}><BookCard bookTitle={item.name} authorName={item.author} imagePath={item.image} note={parseInt(item.note)} statut={item.statut} /></Pressable></View> : <View />
+                    item.statut === filtre ? <View >
+                        <Pressable onPress={() => { openBookCard(item.id) }} onLongPress={() => { deleteBook(item.id) }}>
+                            <BookCard bookTitle={item.name} authorName={item.author} imagePath={item.image} note={parseInt(item.note)} statut={item.statut} />
+                        </Pressable>
+                    </View>
+                        :
+                        <View />
                 }
                 keyExtractor={(item, index) => index.toString()}
             />

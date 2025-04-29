@@ -25,7 +25,7 @@ type Props = {
 export default function EditBook({ bookTitle, authorName, imagePath, note, statut, handleOk, handleCancel, setTitreLivre, setNomAuteur, setImagePath, setStatut, setNote }: Props) {
     const [scanned, setScanned] = useState(true);
     const [imageTmp, setImageTmp] = useState({ uri: imagePath });
-    const [selectedStatut, setSelectedStatut] = useState<string>(statut === '' ? 'Sélectionnez une option' : (statut === 'Wish' ? 'A Lire' : 'Lu'));
+    const [selectedStatut, setSelectedStatut] = useState<string>(statut === '' ? 'Sélectionnez une option' : (statut === 'WISHLIST' ? 'A Lire' : 'Lu'));
 
     console.log("EditBook Statut : " + statut);
     const data = [
@@ -37,21 +37,21 @@ export default function EditBook({ bookTitle, authorName, imagePath, note, statu
 
     const pickImageAsync = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ['images'],
-          allowsEditing: true,
-          quality: 1,
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            quality: 1,
         });
-    
+
         if (!result.canceled) {
-          console.log(result);
-          console.log("Prise de la photo ==> " + result.assets[0].uri);
-                setImagePath(result.assets[0].uri);
-                setImageTmp(result.assets[0]);
-                setScanned(true);
+            console.log(result);
+            console.log("Prise de la photo ==> " + result.assets[0].uri);
+            setImagePath(result.assets[0].uri);
+            setImageTmp(result.assets[0]);
+            setScanned(true);
         } else {
-          alert('You did not select any image.');
+            alert('You did not select any image.');
         }
-      };
+    };
 
     function handleCancelCamera() {
         setScanned(true);
@@ -60,9 +60,9 @@ export default function EditBook({ bookTitle, authorName, imagePath, note, statu
     function onChangeStatut(value: string) {
         setSelectedStatut(value);
         if (value === 'Lu') {
-            setStatut('Lu');
+            setStatut('LU');
         } else {
-            setStatut('Wish');
+            setStatut('WISHLIST');
         }
     }
 
@@ -142,7 +142,7 @@ export default function EditBook({ bookTitle, authorName, imagePath, note, statu
                 </View>
             }
             {
-                (scanned && imageTmp.uri.length === 0) &&
+                (scanned && ((imageTmp.uri !== null && imageTmp.uri.length === 0) || imageTmp.uri === null)) &&
                 <View style={stylesAddBook.buttonContainer}>
                     <CircleButton iconName="image" onPress={pickImageAsync} position={'Left'} />
                     <CircleButton iconName="camera" onPress={() => setScanned(false)} position={'Right'} />

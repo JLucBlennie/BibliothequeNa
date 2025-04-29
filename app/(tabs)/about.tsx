@@ -2,12 +2,13 @@ import { ImageBackground, Text, TextInput, View, StyleSheet, Linking } from 'rea
 import { Asset } from "expo-asset";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import appJson from '@/app.json';
-import { useBiblothequeNAContext } from '@/hooks/BibliothequeNAContext';
+import { useBibliothequeNAContext } from '@/hooks/BibliothequeNAContext';
+import { ExternalLink } from '@/components/ExternalLink';
 
 const PlaceholderImage = { uri: Asset.fromModule(require('@/assets/images/background.png')).uri };
 
 export default function AboutScreen() {
-  const { bdd, setBdd } = useBiblothequeNAContext();
+  const { bdd, setBdd } = useBibliothequeNAContext();
   return (
     <View style={styles.container}>
       <ImageBackground style={styles.imageContainer} source={PlaceholderImage}>

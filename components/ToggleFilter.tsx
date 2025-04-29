@@ -3,14 +3,14 @@ import SwitchSelector from "react-native-switch-selector";
 
 type Props = {
     filtre: string;
-    toggleFilter: () => void;
+    toggleFilter: (value: string) => void;
 };
 
 export default function ToggleFilter({ filtre, toggleFilter }: Props) {
     return (
         <SwitchSelector
-            initial={filtre === 'Lu' ? 0 : 1}
-            onPress={toggleFilter}
+            initial={filtre === 'LU' ? 0 : 1}
+            onPress={(value: string) => toggleFilter(value)}
             textColor={'#25292e'} //'#7a44cf'
             selectedColor={'#fff'}
             buttonColor={'#25292e'}
@@ -19,8 +19,8 @@ export default function ToggleFilter({ filtre, toggleFilter }: Props) {
             bold
             hasPadding
             options={[
-                { label: "Mes Livres Lus...", value: "Lu" },
-                { label: "Mes Livres à Lire...", value: "Wish" }
+                { label: "Mes Livres Lus...", value: "LU" },
+                { label: "Mes Livres à Lire...", value: "WISHLIST" }
             ]}
 
             style={{
@@ -30,22 +30,6 @@ export default function ToggleFilter({ filtre, toggleFilter }: Props) {
             }}
         />
     );
-
-    if (filtre === 'Lu') {
-        return (
-            <View style={styles.buttonContainerQuestion}>
-                <Button title="Lus..." onPress={toggleFilter} disabled />
-                <Button title="A lire..." onPress={toggleFilter} />
-            </View>
-        );
-    } else {
-        return (
-            <View style={styles.buttonContainerQuestion}>
-                <Button title="Lus..." onPress={toggleFilter} />
-                <Button title="A lire..." onPress={toggleFilter} disabled />
-            </View>
-        );
-    }
 }
 
 const styles = StyleSheet.create({

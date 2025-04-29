@@ -25,7 +25,7 @@ type Props = {
 export default function AddBook({ bookTitle, authorName, imagePath, note, statut, handleOk, handleCancel, setTitreLivre, setNomAuteur, setImagePath, setStatut, setNote }: Props) {
     const [scanned, setScanned] = useState(true);
     const [imageTmp, setImageTmp] = useState({ uri: imagePath });
-    const [selectedStatut, setSelectedStatut] = useState<string>(statut === '' ? 'Sélectionnez une option' : (statut === 'Wish' ? 'A Lire' : 'Lu'));
+    const [selectedStatut, setSelectedStatut] = useState<string>(statut === '' ? 'Sélectionnez une option' : (statut === 'WHISHLIST' ? 'A Lire' : 'Lu'));
 
     console.log("AddBook Statut : " + statut);
     const data = [
@@ -57,10 +57,10 @@ export default function AddBook({ bookTitle, authorName, imagePath, note, statut
 
     function onChangeStatut(value: string) {
         setSelectedStatut(value);
-        if (value === 'Lu') {
-            setStatut('Lu');
+        if (value === 'LU') {
+            setStatut('LU');
         } else {
-            setStatut('Wish');
+            setStatut('WHISHLIST');
         }
     }
     function handleImageDone(imgPath: string) {

@@ -21,8 +21,8 @@ interface BibliothequeNAContextType {
 const BibliothequeNAContext = createContext<BibliothequeNAContextType | undefined>(undefined);
 
 // Provider
-export const BibliothequeNAProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [bdd, setBdd] = useState<bddType>(bddJSONFirst);
+export const BibliothequeNAProvider =({children} : { children: ReactNode }) => {
+    const [bdd, setBdd] = useState(bddJSONFirst);
 
     return (
         <BibliothequeNAContext.Provider value={{ bdd, setBdd }}>
@@ -32,7 +32,7 @@ export const BibliothequeNAProvider: React.FC<{ children: ReactNode }> = ({ chil
 };
 
 // Hook pour utiliser le contexte
-export const useBibliothequeNAContext = (): BibliothequeNAContextType => {
+export const useBibliothequeNAContext = () => {
     const context = useContext(BibliothequeNAContext);
     if (!context) {
         throw new Error("useMyContext must be used within a BibliothequeNAProvider");

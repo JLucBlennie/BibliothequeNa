@@ -22,7 +22,7 @@ export default function QDeleteBook({ bookTitle, authorName, imagePath, note, st
                 <Text style={styles.text}>Livre : {bookTitle}</Text>
                 <Text style={styles.text}>Auteur : {authorName}</Text>
                 <View style={styles.notestatut}>
-                    <Text style={styles.textstatut}>{statut}</Text>
+                    <Text style={styles.textstatut}>{statut === 'WISHLIST' ? 'A lire' : 'Lu'}</Text>
                     <Note note={note} taille={18} />
                 </View>
                 <View style={{ paddingTop: 5, paddingBottom: 5 }}>

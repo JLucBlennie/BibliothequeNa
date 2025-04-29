@@ -12,7 +12,7 @@ type Props = {
 export default function QToAddBook({ statut, handleAjouter, handleNePasAjouter }: Props) {
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Tu veux l'ajouter dans ta liste des livres {statut === 'Lu ' ? 'lus' : statut === 'Wish' ? 'à lire' : ''} ?</Text>
+            <Text style={styles.text}>Tu veux l'ajouter dans ta liste des livres {statut === 'LU ' ? 'lus' : statut === 'WISHLIST' ? 'à lire' : ''} ?</Text>
             <View style={styles.buttonContainerQuestion}>
                 <CircleButton iconName="check" onPress={handleAjouter} position={'Left'} />
                 <CircleButton iconName="cancel" onPress={handleNePasAjouter} position={'Right'} />
