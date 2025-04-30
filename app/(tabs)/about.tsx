@@ -9,6 +9,19 @@ const PlaceholderImage = { uri: Asset.fromModule(require('@/assets/images/backgr
 
 export default function AboutScreen() {
   const { bdd, setBdd } = useBibliothequeNAContext();
+  const handlePress = () => {
+    const url = encodeURI('https://jlucblennie.atlassian.net/jira/software/form/fb30e4bc-061d-481f-8751-95292c8c5d79');
+
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        console.log("Ouverture de l'URL :", url);
+        Linking.openURL(url);
+      } else {
+        console.warn("Impossible d'ouvrir l'URL :", url);
+      }
+    }).catch((err) => console.error("Erreur avec l'URL :", err));
+  };
+
   return (
     <View style={styles.container}>
       <ImageBackground style={styles.imageContainer} source={PlaceholderImage}>
@@ -21,7 +34,7 @@ export default function AboutScreen() {
             <TextInput style={styles.textinput} multiline>{JSON.stringify(bdd)}</TextInput>
           </View>
           <View style={{ paddingTop: 20 }}>
-            <Text style={styles.textbug} onPress={() => { Linking.openURL('https://jlucblennie.atlassian.net/jira/software/form/fb30e4bc-061d-481f-8751-95292c8c5d79?atlOrigin=eyJpIjoiMjQ3YzUxZmJmMTYwNDM4NTgxZGRhNWJkM2Q3Mzc1NzQiLCJwIjoiaiJ9'); }}>Rapporter un Bug !!!</Text>
+            <Text style={styles.textbug} onPress={handlePress}>Rapporter un Bug !!!</Text>
           </View>
         </View>
       </ImageBackground>
