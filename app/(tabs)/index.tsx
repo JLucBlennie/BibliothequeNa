@@ -41,6 +41,7 @@ export default function Index() {
   console.log("Valeur de firstLaunch : " + firstLaunch);
   if (firstLaunch) {
     console.log("On lance pour la 1ere fois...");
+    // Gestion de la dernière date de synchronisation : elle doit se faire 
     console.log("==> connexion au server ...");
     fetch("http://51.83.78.37:9090/bibna", {
       method: "GET",
